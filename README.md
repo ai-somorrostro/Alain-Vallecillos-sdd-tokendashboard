@@ -1,21 +1,84 @@
+# Especificación del Proyecto: Dashboard de Modelos de IA
 
+## 1. Petición Inicial (Departamento de Diseño)
 
-## Desde el departamento de diseño habeis recibido la sigiente propuesta.
+> **De:** Departamento de Diseño  
+> **Asunto:** Dashboard de modelos de IA  
+>
+> Necesitamos un dashboard interno para poder comparar los distintos modelos de lenguaje que estamos evaluando para el equipo. Ahora mismo cada uno mira los precios y las métricas en sitios distintos y perdemos mucho tiempo. 
+>
+> La idea es tener de un vistazo los modelos *open source* más relevantes del momento, con la info que más nos importa a la hora de decidir cuál usar: 
+> - Cuánto cuesta usarlos (tanto lo que enviamos como lo que nos devuelven).
+> - Qué tan rápido empiezan a responder (TTFT).
+> - Qué tipo de contenido aceptan y devuelven (texto, imágenes...).
+> - Cuánto los está consumiendo el equipo ahora mismo (diario y semanal).
+>
+> De momento, con datos de prueba nos vale para validar que el diseño y la idea funcionan (conectaremos los datos reales más adelante). Queremos una tabla sencilla: nada de librerías ni frameworks, solo HTML, CSS y JS plano.
+> 
+> ¡Gracias!
 
-***
-Asunto: Dashboard de modelos de IA.
+---
 
-Necesitamos un dashboard interno para poder comparar los distintos modelos de lenguaje que estamos evaluando para el equipo. Ahora mismo cada uno mira los precios y las métricas en sitios distintos y perdemos mucho tiempo. La idea es tener de un vistazo los modelos open source más relevantes del momento, con la info que más nos importa a la hora de decidir cuál usar: cuánto cuesta usarlos (tanto lo que enviamos como lo que nos devuelven), qué tan rápido empiezan a responder, qué tipo de contenido aceptan y devuelven (texto, imágenes...), y cuánto los está consumiendo el equipo ahora mismo, tanto en el día a día como en la semana. Ahora mismo no tenemos acceso todavía a los datos reales de uso (eso lo conectaremos más adelante con nuestro proveedor), así que de momento con datos de prueba nos vale para validar que el diseño y la idea funcionan. Nos gustaría poder verlo todos fácilmente y, si se puede, poder ordenarlos o quedarnos solo con los que nos interesan en cada momento. Más adelante seguro que pedimos poder comparar varios visualmente, pero para arrancar con tenerlo listado ya sería un buen primer paso. Nada muy complicado de mantener, no tenemos mucho presupuesto para infraestructura ahora mismo. Nos gustaría tenerlo para enseñárselo a dirección la semana que viene. Gracias!
-***
+## 2. Instrucciones Generales
 
-## Instrucciones de trabajo
+* **Repositorio:** Clonar el repositorio asignado.
+* **Datos de prueba:** Utilizar exclusivamente los datos alojados en `mock-data.json` (cargados vía `fetch`).
+* **Restricción global:** No se fusionará nada a la rama principal (`main`/`master` original del repositorio).
+* **Alcance:** Es indispensable cumplir todos los requerimientos técnicos y funcionales antes de dar una tarea por finalizada.
 
-1. Clonar el repo
+---
 
-2. Cada uno trabajara desde una rama con su nombre y apellido (ej. mikel.diez)
+## 3. Flujo de Git: Feature Branching
 
-3. No se fusionara nada a la rama principal. Es indispensable que se cumpla toda la peticion del cliente
+Todo el trabajo debe estructurarse bajo el prefijo `nombre.apellido` de cada desarrollador:
 
-## Datos de test
+1. **Rama Base (Master personal):**
+   * Crear la rama: `nombre.apellido.master`
+2. **Rama de Integración (Develop personal):**
+   * Crear la rama: `nombre.apellido.develop` (nace de tu rama master).
+3. **Ramas de Funcionalidad (Features):**
+   * Convención: `feature.nombre.apellido/<nombre-feature>`  
+   * *Ejemplo:* `feature.mikel.diez/mi-feature-lol`
 
-Los datos se encuentran en el documento mock-data.json
+> **Regla de entrega:** Las *features* deben implementarse de forma **secuencial** (una por una). No se iniciará la siguiente hasta que la anterior esté finalizada e integrada en tu rama `develop`.
+
+---
+
+## 4. Fases de Desarrollo (Evolutivos)
+
+### Feature 1: Ordenación y Filtros
+
+> **Asunto:** Feature 1 – Ordenación y filtros
+>
+> Toca avanzar con la siguiente parte del dashboard: necesitamos meter ordenación y filtros a la tabla que ya tenemos.
+>
+> - **Ordenación:** Que se pueda ordenar por cualquier columna haciendo clic en su cabecera, alternando entre ascendente y descendente.
+> - **Filtros:** Poder filtrar las filas por el nombre del modelo y por la modalidad (tanto de entrada como de salida).
+>
+> *Condición técnica:* Sin librerías externas (JavaScript puro) y sin tests.
+
+---
+
+### Feature 2: Visualizaciones y Gráficas
+
+> **Asunto:** Feature 2 – Gráficas
+>
+> Queremos meter ahora la parte visual justo encima de la tabla para comparar los modelos de un vistazo.
+>
+> - **Gráfico de barras:** Comparar precios de token de entrada y salida entre los 10 modelos.
+> - **Sparklines o barras:** Mostrar el consumo de tokens (entrada y salida) a nivel diario y semanal.
+>
+> *Condición técnica:* Implementación nativa con **Canvas** o **SVG** (sin Chart.js ni librerías similares) y sin tests.
+
+---
+
+### Feature 3: Vista de Detalle
+
+> **Asunto:** Feature 3 – Vista extendida
+>
+> Añadir una vista de detalle por modelo: al hacer clic en cualquier fila de la tabla, debe abrirse un panel lateral o modal con:
+>
+> - Todas las métricas del modelo en formato extendido.
+> - Gráficas individuales específicas de dicho modelo.
+>
+> *Condición técnica:* Todo nativo, sin dependencias externas y sin tests.
