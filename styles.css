@@ -1,0 +1,93 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  background-color: #f4f6f8;
+  color: #1f2933;
+  line-height: 1.5;
+}
+
+.header {
+  background-color: #0f172a;
+  color: #f8fafc;
+  padding: 24px 32px;
+}
+
+.header h1 {
+  font-size: 1.5rem;
+  font-weight: 600;
+}
+
+.header .subtitle {
+  color: #94a3b8;
+  font-size: 0.9rem;
+  margin-top: 4px;
+}
+
+.main {
+  padding: 24px 32px;
+}
+
+.table-wrap {
+  background-color: #ffffff;
+  border-radius: 8px;
+  overflow-x: auto;
+  box-shadow: 0 1px 3px rgba(15, 23, 42, 0.1);
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  min-width: 900px;
+}
+
+thead th {
+  background-color: #e2e8f0;
+  color: #334155;
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  text-align: left;
+  padding: 12px 14px;
+  white-space: nowrap;
+}
+
+tbody td {
+  padding: 12px 14px;
+  border-bottom: 1px solid #e8edf2;
+  font-size: 0.9rem;
+  white-space: nowrap;
+}
+
+tbody tr:nth-child(even) {
+  background-color: #f8fafc;
+}
+
+tbody tr:hover {
+  background-color: #eef2f7;
+}
+
+.model-name {
+  font-weight: 600;
+}
+
+.price {
+  font-variant-numeric: tabular-nums;
+}
+
+.tokens {
+  font-variant-numeric: tabular-nums;
+  color: #475569;
+}
+
+.modality {
+  background-color: #e0f2fe;
+  color: #075985;
+  padding: 2px 8px;
+  border-radius: 999px;
+  font-size: 0.75rem;
+}
