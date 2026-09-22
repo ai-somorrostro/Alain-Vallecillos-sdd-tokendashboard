@@ -25,7 +25,7 @@
 * **Datos de prueba:** Utilizar exclusivamente los datos alojados en `mock-data.json` (cargados vía `fetch`).
 * **Restricción global:** No se fusionará nada a la rama principal (`main`/`master` original del repositorio).
 * **Alcance:** Es indispensable cumplir todos los requerimientos técnicos y funcionales antes de dar una tarea por finalizada.
-
+* **Desarrollo:** Las especificaciones de integraran y desarrollaran una por una de manera incremental.
 ---
 
 ## 3. Flujo de Git: Feature Branching
