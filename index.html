@@ -81,7 +81,19 @@
       <ul class="legend" id="chart-legend"></ul>
     </section>
 
-    <script src="app.js?v=5"></script>
+    <div class="drawer-backdrop" id="drawer-backdrop" hidden></div>
+    <aside class="drawer" id="drawer" hidden role="dialog" aria-modal="true" aria-labelledby="drawer-title">
+      <div class="drawer-head">
+        <h2 id="drawer-title">Model</h2>
+        <button id="drawer-close" type="button" aria-label="Close detail">&times;</button>
+      </div>
+      <p class="drawer-sub" id="drawer-sub"></p>
+      <div class="drawer-grid" id="drawer-grid"></div>
+      <h3>Metrics vs global maximums</h3>
+      <div class="chart-area" id="drawer-chart"></div>
+    </aside>
+
+    <script src="app.js?v=6"></script>
   </div>
 </body>
 </html>

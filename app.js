@@ -16,6 +16,13 @@
   var filterModalityEl = document.getElementById("filter-modality");
   var filterCountEl = document.getElementById("filter-count");
   var compareSection = document.getElementById("compare-section");
+  var drawer = document.getElementById("drawer");
+  var drawerBackdrop = document.getElementById("drawer-backdrop");
+  var drawerTitle = document.getElementById("drawer-title");
+  var drawerSub = document.getElementById("drawer-sub");
+  var drawerGrid = document.getElementById("drawer-grid");
+  var drawerChart = document.getElementById("drawer-chart");
+  var drawerClose = document.getElementById("drawer-close");
 
   var data = [];
   var sortState = { key: null, dir: "desc" };
@@ -292,13 +299,7 @@
     return el;
   }
 
-  function renderChart() {
-    if (!data.length) return;
-    var idx = chartModel;
-    if (isNaN(idx) || idx < 0 || idx >= data.length) idx = 0;
-    var model = data[idx];
-    chartTitle.textContent = "Metrics: " + model.name;
-
+  function buildChartSvg(model) {
     var W = 640, H = 300, L = 48, R = 8, T = 24, B = 56;
     var plotW = W - L - R, plotH = H - T - B;
     var svg = svgEl("svg", {
@@ -335,9 +336,18 @@
       svg.appendChild(bl);
     }
     svg.appendChild(svgEl("line", { x1: L, y1: T + plotH, x2: W - R, y2: T + plotH, "class": "baseline" }));
+    return svg;
+  }
+
+  function renderChart() {
+    if (!data.length) return;
+    var idx = chartModel;
+    if (isNaN(idx) || idx < 0 || idx >= data.length) idx = 0;
+    var model = data[idx];
+    chartTitle.textContent = "Metrics: " + model.name;
 
     chartArea.textContent = "";
-    chartArea.appendChild(svg);
+    chartArea.appendChild(buildChartSvg(model));
   }
 
   function renderLegend() {
@@ -512,6 +522,64 @@
     chartSection.hidden = !chartVisible;
     chartToggle.textContent = chartVisible ? "Hide chart" : "Show chart";
     chartToggle.setAttribute("aria-expanded", String(chartVisible));
+  });
+
+  function openDrawer(idx) {
+    var m = data[idx];
+    if (!m || !drawer) return;
+    drawerTitle.textContent = m.name;
+    drawerSub.textContent = "All figures per 1,000,000 tokens unless stated otherwise.";
+    drawerGrid.textContent = "";
+    var items = [
+      ["Input price", formatPrice(m.inputPricePerToken)],
+      ["Output price", formatPrice(m.outputPricePerToken)],
+      ["TTFT", formatTtft(m.ttft_ms)],
+      ["Modality", formatModality(m)],
+      ["Day tokens in", formatTokens(m.inputTokensDay)],
+      ["Day tokens out", formatTokens(m.outputTokensDay)],
+      ["Day cost", formatCost(dayCost(m))],
+      ["Week tokens in", formatTokens(m.inputTokensWeek)],
+      ["Week tokens out", formatTokens(m.outputTokensWeek)],
+      ["Week cost", formatCost(weekCost(m))]
+    ];
+    for (var i = 0; i < items.length; i++) {
+      var box = document.createElement("div");
+      box.className = "drawer-item";
+      var k = document.createElement("span");
+      k.className = "k";
+      k.textContent = items[i][0];
+      var v = document.createElement("span");
+      v.className = "v";
+      v.textContent = items[i][1];
+      box.appendChild(k);
+      box.appendChild(v);
+      drawerGrid.appendChild(box);
+    }
+    drawerChart.textContent = "";
+    drawerChart.appendChild(buildChartSvg(m));
+    drawer.hidden = false;
+    drawerBackdrop.hidden = false;
+    if (drawerClose.focus) drawerClose.focus();
+  }
+
+  function closeDrawer() {
+    if (!drawer) return;
+    drawer.hidden = true;
+    drawerBackdrop.hidden = true;
+  }
+
+  tbody.addEventListener("click", function (e) {
+    var tr = e.target.closest("tr");
+    if (!tr || !tr.dataset || !tr.dataset.modelIndex) return;
+    var idx = parseInt(tr.dataset.modelIndex, 10);
+    if (isNaN(idx)) return;
+    openDrawer(idx);
+  });
+
+  if (drawerClose) drawerClose.addEventListener("click", closeDrawer);
+  if (drawerBackdrop) drawerBackdrop.addEventListener("click", closeDrawer);
+  document.addEventListener("keydown", function (e) {
+    if (e.key === "Escape" && drawer && !drawer.hidden) closeDrawer();
   });
 
   fetch("mock-data.json")
