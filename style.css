@@ -523,6 +523,10 @@ td.empty {
   border-spacing: 5px;
 }
 
+#duel-table tr {
+  cursor: default;
+}
+
 #duel-table th {
   background: linear-gradient(180deg, var(--navy-hover), var(--navy));
   color: #eaf2fb;

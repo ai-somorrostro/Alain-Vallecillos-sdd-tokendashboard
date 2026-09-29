@@ -21,6 +21,13 @@
   var kpiDay = document.getElementById("kpi-day");
   var kpiWeek = document.getElementById("kpi-week");
   var kpiTtft = document.getElementById("kpi-ttft");
+  var duelSection = document.getElementById("duel-section");
+  var duelA = document.getElementById("duel-a");
+  var duelB = document.getElementById("duel-b");
+  var duelHeadA = document.getElementById("duel-head-a");
+  var duelHeadB = document.getElementById("duel-head-b");
+  var duelRows = document.getElementById("duel-rows");
+  var duelChart = document.getElementById("duel-chart");
   var drawer = document.getElementById("drawer");
   var drawerBackdrop = document.getElementById("drawer-backdrop");
   var drawerTitle = document.getElementById("drawer-title");
@@ -258,6 +265,7 @@
     if (filtersBox) filtersBox.hidden = true;
     if (compareSection) compareSection.hidden = true;
     if (kpisBox) kpisBox.hidden = true;
+    if (duelSection) duelSection.hidden = true;
   }
 
   var defaultDirs = { name: "asc", modality: "asc" };
@@ -294,6 +302,7 @@
   var metrics = [
     {
       id: "inPrice",
+      better: "low",
       short: "In price",
       color: "#1b3b5f",
       desc: "Input price per 1,000,000 tokens (USD) - what you pay for every million tokens you send to the model.",
@@ -302,6 +311,7 @@
     },
     {
       id: "outPrice",
+      better: "low",
       short: "Out price",
       color: "#356ea6",
       desc: "Output price per 1,000,000 tokens (USD) - what you pay for every million tokens the model generates.",
@@ -310,6 +320,7 @@
     },
     {
       id: "ttft",
+      better: "low",
       short: "TTFT",
       color: "#78aad6",
       desc: "Time to first token in milliseconds - how long until the model starts replying. Lower is faster.",
@@ -326,6 +337,7 @@
     },
     {
       id: "dayCost",
+      better: "low",
       short: "Day cost",
       color: "#24344d",
       desc: "Estimated daily cost = (day input tokens x input price) + (day output tokens x output price).",
@@ -334,6 +346,7 @@
     },
     {
       id: "weekCost",
+      better: "low",
       short: "Week cost",
       color: "#5f96cf",
       desc: "Estimated weekly cost = (week input tokens x input price) + (week output tokens x output price).",
@@ -648,6 +661,132 @@
     if (e.key === "Escape" && drawer && !drawer.hidden) closeDrawer();
   });
 
+  function populateDuelSelects() {
+    if (!duelA || !duelB) return;
+    duelA.textContent = "";
+    duelB.textContent = "";
+    for (var i = 0; i < data.length; i++) {
+      var optA = document.createElement("option");
+      optA.value = String(i);
+      optA.textContent = data[i].name;
+      duelA.appendChild(optA);
+      var optB = document.createElement("option");
+      optB.value = String(i);
+      optB.textContent = data[i].name;
+      duelB.appendChild(optB);
+    }
+    duelA.value = "0";
+    duelB.value = "1";
+  }
+
+  function renderDuelChart(A, B) {
+    if (!duelChart) return;
+    duelChart.textContent = "";
+    var W = 640, H = 300, L = 48, R = 8, T = 24, B2 = 56;
+    var plotW = W - L - R, plotH = H - T - B2;
+    var svg = svgEl("svg", {
+      viewBox: "0 0 " + W + " " + H,
+      width: W,
+      height: H,
+      role: "img",
+      "aria-label": "Metric comparison between " + A.name + " and " + B.name
+    });
+    for (var p = 0; p <= 4; p++) {
+      var gy = T + plotH - (plotH * p) / 4;
+      svg.appendChild(svgEl("line", { x1: L, y1: gy, x2: W - R, y2: gy, "class": "grid" }));
+      var yl = svgEl("text", { x: L - 6, y: gy + 4, "class": "axis-label", "text-anchor": "end" });
+      yl.textContent = p * 25 + "%";
+      svg.appendChild(yl);
+    }
+    var slot = plotW / metrics.length;
+    var gap = 4;
+    var barW = slot * 0.3;
+    for (var i = 0; i < metrics.length; i++) {
+      var met = metrics[i];
+      var max = metricMaxes[met.id];
+      var va = met.get(A);
+      var vb = met.get(B);
+      var ha = max > 0 ? (va / max) * plotH : 0;
+      var hb = max > 0 ? (vb / max) * plotH : 0;
+      var center = L + slot * i + slot / 2;
+      var bars = [
+        { x: center - barW - gap / 2, h: ha, v: va, color: "#1b3b5f", who: A },
+        { x: center + gap / 2, h: hb, v: vb, color: "#356ea6", who: B }
+      ];
+      for (var b = 0; b < bars.length; b++) {
+        var bar = bars[b];
+        var rect = svgEl("rect", {
+          x: bar.x,
+          y: T + plotH - bar.h,
+          width: barW,
+          height: bar.h,
+          fill: bar.color,
+          "class": "bar"
+        });
+        var t = svgEl("title");
+        t.textContent = bar.who.name + " — " + met.short + ": " + met.fmt(bar.v);
+        rect.appendChild(t);
+        svg.appendChild(rect);
+        var vt = svgEl("text", {
+          x: bar.x + barW / 2,
+          y: T + plotH - bar.h - 6,
+          "class": "bar-value",
+          "text-anchor": "middle"
+        });
+        vt.textContent = met.fmt(bar.v);
+        svg.appendChild(vt);
+      }
+      var bl = svgEl("text", { x: center, y: T + plotH + 18, "class": "bar-label", "text-anchor": "middle" });
+      bl.textContent = met.short;
+      svg.appendChild(bl);
+    }
+    svg.appendChild(svgEl("line", { x1: L, y1: T + plotH, x2: W - R, y2: T + plotH, "class": "baseline" }));
+    duelChart.appendChild(svg);
+    miniLegend(duelChart, [
+      { label: A.name, color: "#1b3b5f" },
+      { label: B.name, color: "#356ea6" }
+    ]);
+  }
+
+  function renderDuel() {
+    if (!data.length || !duelRows) return;
+    var ia = parseInt(duelA.value, 10);
+    var ib = parseInt(duelB.value, 10);
+    if (isNaN(ia) || ia < 0 || ia >= data.length) ia = 0;
+    if (isNaN(ib) || ib < 0 || ib >= data.length) ib = Math.min(1, data.length - 1);
+    var A = data[ia];
+    var B = data[ib];
+    duelHeadA.textContent = A.name;
+    duelHeadB.textContent = B.name;
+    duelRows.textContent = "";
+    for (var i = 0; i < metrics.length; i++) {
+      var met = metrics[i];
+      var va = met.get(A);
+      var vb = met.get(B);
+      var tr = document.createElement("tr");
+      var label = document.createElement("td");
+      label.textContent = met.short;
+      tr.appendChild(label);
+      var tdA = document.createElement("td");
+      tdA.textContent = met.fmt(va);
+      var tdB = document.createElement("td");
+      tdB.textContent = met.fmt(vb);
+      if (met.better === "low" && va !== vb) {
+        if (va < vb) tdA.className = "win";
+        else tdB.className = "win";
+      }
+      tr.appendChild(tdA);
+      tr.appendChild(tdB);
+      duelRows.appendChild(tr);
+    }
+    renderDuelChart(A, B);
+  }
+
+  if (duelA && duelB) {
+    duelA.addEventListener("change", renderDuel);
+    duelB.addEventListener("change", renderDuel);
+  }
+
   fetch("mock-data.json")
     .then(function (res) {
       if (!res.ok) throw new Error("HTTP " + res.status);
@@ -661,6 +800,8 @@
       populateSelect();
       renderLegend();
       renderChart();
+      populateDuelSelects();
+      renderDuel();
     })
     .catch(function (err) {
       showError(

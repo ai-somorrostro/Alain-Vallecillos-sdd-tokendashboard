@@ -100,6 +100,26 @@
       <ul class="legend" id="chart-legend"></ul>
     </section>
 
+    <section class="panel" id="duel-section" aria-label="Compare two models">
+      <h2>Comparador de modelos</h2>
+      <div class="duel-controls">
+        <select id="duel-a" aria-label="First model to compare"></select>
+        <span class="duel-vs">vs</span>
+        <select id="duel-b" aria-label="Second model to compare"></select>
+      </div>
+      <table id="duel-table">
+        <thead>
+          <tr>
+            <th scope="col">Metric</th>
+            <th scope="col" id="duel-head-a">Model A</th>
+            <th scope="col" id="duel-head-b">Model B</th>
+          </tr>
+        </thead>
+        <tbody id="duel-rows"></tbody>
+      </table>
+      <div id="duel-chart"></div>
+    </section>
+
     <div class="drawer-backdrop" id="drawer-backdrop" hidden></div>
     <aside class="drawer" id="drawer" hidden role="dialog" aria-modal="true" aria-labelledby="drawer-title">
       <div class="drawer-head">
@@ -112,7 +132,7 @@
       <div class="chart-area" id="drawer-chart"></div>
     </aside>
 
-    <script src="app.js?v=7"></script>
+    <script src="app.js?v=8"></script>
   </div>
 </body>
 </html>
