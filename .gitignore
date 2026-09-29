@@ -1,0 +1,9 @@
+# OS / editor
+.DS_Store
+*.log
+
+# dependencias (regenerables)
+node_modules/
+
+# opencode local (si apareciera fuera de .opencode/)
+.opencode/node_modules/
