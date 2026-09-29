@@ -1,0 +1,207 @@
+* {
+  box-sizing: border-box;
+}
+
+body {
+  font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+  margin: 24px;
+  color: #1a1a2e;
+  background: #fafafa;
+}
+
+h1 {
+  margin: 0 0 4px;
+  font-size: 1.5rem;
+}
+
+.subtitle {
+  margin: 0 0 20px;
+  color: #666;
+  font-size: 0.9rem;
+}
+
+.error {
+  margin-bottom: 16px;
+  padding: 12px 16px;
+  background: #fdecea;
+  border: 1px solid #f5c6c2;
+  border-radius: 4px;
+  color: #b3261e;
+  font-size: 0.95rem;
+}
+
+.table-wrap {
+  overflow-x: auto;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  background: #fff;
+}
+
+table {
+  border-collapse: collapse;
+  width: 100%;
+  white-space: nowrap;
+  font-size: 0.9rem;
+}
+
+thead th {
+  position: sticky;
+  top: 0;
+  background: #f0f0f4;
+  border-bottom: 2px solid #ccc;
+  padding: 10px 14px;
+  text-align: right;
+  font-weight: 600;
+  cursor: pointer;
+  user-select: none;
+}
+
+thead th:first-child,
+thead th:nth-child(5) {
+  text-align: left;
+}
+
+thead th:hover {
+  background: #e4e4ea;
+}
+
+thead th[aria-sort="descending"]::after {
+  content: " \25BC";
+  font-size: 0.7em;
+}
+
+thead th[aria-sort="ascending"]::after {
+  content: " \25B2";
+  font-size: 0.7em;
+}
+
+tbody td {
+  padding: 8px 14px;
+  border-bottom: 1px solid #eee;
+  text-align: right;
+}
+
+tbody td:first-child {
+  text-align: left;
+  font-weight: 500;
+}
+
+tbody td:nth-child(5) {
+  text-align: left;
+}
+
+tbody tr:nth-child(even) {
+  background: #f8f8fb;
+}
+
+tbody tr:hover {
+  background: #eef2ff;
+}
+
+[hidden] {
+  display: none !important;
+}
+
+.chart-controls {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin: 20px 0 4px;
+}
+
+.chart-controls button {
+  padding: 6px 14px;
+  font-size: 0.85rem;
+  border: 1px solid #bbb;
+  border-radius: 4px;
+  background: #fff;
+  cursor: pointer;
+}
+
+.chart-controls button:hover {
+  background: #f0f0f4;
+}
+
+.chart-controls select {
+  padding: 5px 8px;
+  font-size: 0.9rem;
+  border: 1px solid #bbb;
+  border-radius: 4px;
+  background: #fff;
+}
+
+.chart-controls select:disabled {
+  opacity: 0.6;
+  cursor: wait;
+}
+
+#chart-section h2 {
+  font-size: 1.1rem;
+  margin: 10px 0 4px;
+}
+
+.chart-note {
+  margin: 0 0 12px;
+  font-size: 0.8rem;
+  color: #666;
+}
+
+.chart-area svg {
+  max-width: 100%;
+  height: auto;
+  background: #fff;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+}
+
+.grid {
+  stroke: #e5e5ea;
+  stroke-width: 1;
+}
+
+.baseline {
+  stroke: #999;
+  stroke-width: 1;
+}
+
+.axis-label {
+  font-size: 10px;
+  fill: #888;
+}
+
+.bar-label {
+  font-size: 11px;
+  fill: #444;
+}
+
+.bar-value {
+  font-size: 11px;
+  fill: #1a1a2e;
+  font-weight: 600;
+}
+
+.legend {
+  list-style: none;
+  margin: 14px 0 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+  gap: 6px 18px;
+}
+
+.legend li {
+  display: flex;
+  gap: 8px;
+  align-items: baseline;
+  font-size: 0.82rem;
+  color: #444;
+}
+
+.swatch {
+  flex: 0 0 12px;
+  width: 12px;
+  height: 12px;
+  border-radius: 2px;
+  position: relative;
+  top: 1px;
+}

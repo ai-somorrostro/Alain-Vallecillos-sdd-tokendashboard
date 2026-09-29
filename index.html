@@ -1,39 +1,55 @@
 <!DOCTYPE html>
-<html lang="es">
+<html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Dashboard de Modelos de IA</title>
-  <link rel="stylesheet" href="styles.css">
+  <title>Token Dashboard</title>
+  <link rel="stylesheet" href="style.css?v=2">
 </head>
 <body>
-  <header class="header">
-    <h1>Dashboard de Modelos Open Source</h1>
-    <p class="subtitle">Comparativa de modelos de lenguaje para el equipo</p>
-  </header>
+  <h1>Token Dashboard</h1>
+  <p class="subtitle">Model pricing, latency, and token volume comparison</p>
 
-  <main class="main">
-    <section class="table-wrap">
-      <table id="models-table">
-        <thead>
-          <tr>
-            <th scope="col">Modelo</th>
-            <th scope="col">Precio entrada</th>
-            <th scope="col">Precio salida</th>
-            <th scope="col">TTFT</th>
-            <th scope="col">Entrada</th>
-            <th scope="col">Salida</th>
-            <th scope="col">Tokens/día (ent.)</th>
-            <th scope="col">Tokens/día (sal.)</th>
-            <th scope="col">Tokens/semana (ent.)</th>
-            <th scope="col">Tokens/semana (sal.)</th>
-          </tr>
-        </thead>
-        <tbody></tbody>
-      </table>
-    </section>
-  </main>
+  <div id="error" class="error" hidden></div>
 
-  <script src="app.js"></script>
+  <div class="table-wrap">
+    <table id="dashboard">
+      <thead>
+        <tr>
+          <th data-key="name" scope="col" title="Model name. Click the header to sort alphabetically.">Model</th>
+          <th data-key="inputPricePerToken" scope="col" title="Input price per 1,000,000 tokens in USD. What you pay for every million tokens you send to the model. Click to sort.">In $/1M</th>
+          <th data-key="outputPricePerToken" scope="col" title="Output price per 1,000,000 tokens in USD. What you pay for every million tokens the model generates. Click to sort.">Out $/1M</th>
+          <th data-key="ttft_ms" scope="col" title="Time to first token, in milliseconds. How long until the model starts replying. Lower is faster. Click to sort.">TTFT</th>
+          <th data-key="modality" scope="col" title="Data types accepted as input -> data type produced as output, e.g. Text+Image -> Text. Click to sort.">Modality</th>
+          <th data-key="inputTokensDay" scope="col" title="Input tokens consumed per day. Click to sort.">Day In</th>
+          <th data-key="outputTokensDay" scope="col" title="Output tokens generated per day. Click to sort.">Day Out</th>
+          <th data-key="dayCost" scope="col" title="Estimated daily cost = (day input tokens x input price) + (day output tokens x output price). Click to sort.">Day Cost</th>
+          <th data-key="inputTokensWeek" scope="col" title="Input tokens consumed per week. Click to sort.">Week In</th>
+          <th data-key="outputTokensWeek" scope="col" title="Output tokens generated per week. Click to sort.">Week Out</th>
+          <th data-key="weekCost" scope="col" title="Estimated weekly cost = (week input tokens x input price) + (week output tokens x output price). Click to sort.">Week Cost</th>
+        </tr>
+      </thead>
+      <tbody id="rows"></tbody>
+    </table>
+  </div>
+
+  <div class="chart-controls" id="chart-controls">
+    <button id="chart-toggle" type="button" aria-expanded="true" aria-controls="chart-section">Hide chart</button>
+    <span id="chart-pick">
+      <label for="model-select">Model:</label>
+      <select id="model-select" disabled>
+        <option value="">Loading models...</option>
+      </select>
+    </span>
+  </div>
+
+  <section id="chart-section" aria-label="Selected model chart">
+    <h2 id="chart-title">Metrics</h2>
+    <p class="chart-note">Each bar is relative to the highest value for that metric among all models (100%). The real value is printed above each bar.</p>
+    <div class="chart-area" id="chart-area"></div>
+    <ul class="legend" id="chart-legend"></ul>
+  </section>
+
+  <script src="app.js?v=2"></script>
 </body>
 </html>
