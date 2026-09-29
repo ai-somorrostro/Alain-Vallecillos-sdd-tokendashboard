@@ -82,3 +82,37 @@ Todo el trabajo debe estructurarse bajo el prefijo `nombre.apellido` de cada des
 > - Gráficas individuales específicas de dicho modelo.
 >
 > *Condición técnica:* Todo nativo, sin dependencias externas y sin tests.
+
+---
+
+# Notas del proyecto (openspec-token-dashboard-demo)
+
+Dashboard de comparación de modelos de lenguaje: precios, latencia (TTFT),
+modalidad y volumen de tokens (día/semana), con costes derivados.
+
+Hecho con **HTML, CSS y JavaScript puros** — sin librerías, sin build, sin dependencias.
+
+## Cómo abrirlo
+
+`fetch()` no funciona con `file://`, asíque sirve el directorio por HTTP:
+
+```bash
+python3 -m http.server
+# abre http://localhost:8000/
+```
+
+## Estructura de ramas (nomenclatura de la organización)
+
+```
+alain.vallecillos.master     scaffold del curso + estas notas
+  |
+  +-- alain.vallecillos.develop   + .gitignore, openspec/ (planificación), .opencode/
+        |
+        +-- feature.alain.vallecillos/token-dashboard-demo
+                                 + el proyecto: index.html, style.css, app.js, mock-data.json
+```
+
+## Gestión del cambio
+
+Planificación con [OpenSpec](https://openspec.org): los cambios viven en
+`openspec/changes/` (ver `add-token-dashboard`).
