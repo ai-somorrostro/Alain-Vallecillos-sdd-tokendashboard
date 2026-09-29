@@ -13,6 +13,17 @@
 
     <div id="error" class="error" hidden></div>
 
+    <div class="filters" id="filters">
+      <span class="filters-label">Filters</span>
+      <input type="search" id="filter-name" placeholder="Search by name..." autocomplete="off" aria-label="Filter models by name">
+      <select id="filter-modality" aria-label="Filter models by modality">
+        <option value="">All modalities</option>
+        <option value="Text">Text</option>
+        <option value="Text+Image">Text+Image</option>
+      </select>
+      <span class="filter-count" id="filter-count">– of –</span>
+    </div>
+
     <div class="table-wrap">
       <table id="dashboard">
         <thead>
@@ -52,7 +63,7 @@
       <ul class="legend" id="chart-legend"></ul>
     </section>
 
-    <script src="app.js?v=3"></script>
+    <script src="app.js?v=4"></script>
   </div>
 </body>
 </html>

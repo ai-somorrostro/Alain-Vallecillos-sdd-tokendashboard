@@ -11,11 +11,17 @@
   var chartSection = document.getElementById("chart-section");
   var chartToggle = document.getElementById("chart-toggle");
   var chartControls = document.getElementById("chart-controls");
+  var filtersBox = document.getElementById("filters");
+  var filterNameEl = document.getElementById("filter-name");
+  var filterModalityEl = document.getElementById("filter-modality");
+  var filterCountEl = document.getElementById("filter-count");
 
   var data = [];
   var sortState = { key: null, dir: "desc" };
   var selectedModel = null; // null = all models in the table
   var chartModel = 0;       // which model the chart shows
+  var nameFilter = "";
+  var modalityFilter = "";
 
   function formatPrice(p) {
     return "$" + (p * 1e6).toFixed(2);
@@ -82,9 +88,17 @@
     return tr;
   }
 
+  function visibleData() {
+    return data.filter(function (m) {
+      if (nameFilter && m.name.toLowerCase().indexOf(nameFilter) === -1) return false;
+      if (modalityFilter && m.inputModality !== modalityFilter && m.outputModality !== modalityFilter) return false;
+      return true;
+    });
+  }
+
   function render() {
     tbody.textContent = "";
-    var source = selectedModel === null ? data : [data[selectedModel]];
+    var source = selectedModel === null ? visibleData() : [data[selectedModel]];
     var sorted = source.slice();
     if (sortState.key) {
       var cmp = comparators[sortState.key];
@@ -93,10 +107,24 @@
         return cmp(a, b) * dir;
       });
     }
+    if (sorted.length === 0 && data.length > 0) {
+      var emptyRow = document.createElement("tr");
+      var emptyCell = cell("No models match the filters.", "empty");
+      emptyCell.setAttribute("colspan", "11");
+      emptyRow.appendChild(emptyCell);
+      tbody.appendChild(emptyRow);
+    }
     for (var i = 0; i < sorted.length; i++) {
       tbody.appendChild(renderRow(sorted[i]));
     }
+    if (filterCountEl) {
+      filterCountEl.textContent = sorted.length + " of " + data.length + " models";
+    }
     updateHeaderIndicators();
+  }
+
+  function renderAll() {
+    render();
   }
 
   var comparators = {
@@ -153,6 +181,7 @@
     errorBox.hidden = false;
     chartControls.hidden = true;
     chartSection.hidden = true;
+    if (filtersBox) filtersBox.hidden = true;
   }
 
   var defaultDirs = { name: "asc", modality: "asc" };
@@ -173,6 +202,16 @@
   }
 
   table.querySelector("thead").addEventListener("click", onHeaderClick);
+
+  filterNameEl.addEventListener("input", function () {
+    nameFilter = filterNameEl.value.trim().toLowerCase();
+    renderAll();
+  });
+
+  filterModalityEl.addEventListener("change", function () {
+    modalityFilter = filterModalityEl.value;
+    renderAll();
+  });
 
   var SVG_NS = "http://www.w3.org/2000/svg";
 
@@ -360,7 +399,7 @@
     .then(function (json) {
       if (!Array.isArray(json)) throw new Error("Unexpected data shape");
       data = json;
-      render();
+      renderAll();
       computeMaxes();
       populateSelect();
       renderLegend();
