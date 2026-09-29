@@ -13,6 +13,25 @@
 
     <div id="error" class="error" hidden></div>
 
+    <section class="kpis" id="kpis" aria-label="Key figures">
+      <div class="kpi">
+        <span class="kpi-label">Models</span>
+        <span class="kpi-value" id="kpi-count">–</span>
+      </div>
+      <div class="kpi">
+        <span class="kpi-label">Cost / day</span>
+        <span class="kpi-value" id="kpi-day">–</span>
+      </div>
+      <div class="kpi">
+        <span class="kpi-label">Cost / week</span>
+        <span class="kpi-value" id="kpi-week">–</span>
+      </div>
+      <div class="kpi">
+        <span class="kpi-label">Avg TTFT</span>
+        <span class="kpi-value" id="kpi-ttft">–</span>
+      </div>
+    </section>
+
     <div class="filters" id="filters">
       <span class="filters-label">Filters</span>
       <input type="search" id="filter-name" placeholder="Search by name..." autocomplete="off" aria-label="Filter models by name">
@@ -93,7 +112,7 @@
       <div class="chart-area" id="drawer-chart"></div>
     </aside>
 
-    <script src="app.js?v=6"></script>
+    <script src="app.js?v=7"></script>
   </div>
 </body>
 </html>

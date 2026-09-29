@@ -16,6 +16,11 @@
   var filterModalityEl = document.getElementById("filter-modality");
   var filterCountEl = document.getElementById("filter-count");
   var compareSection = document.getElementById("compare-section");
+  var kpisBox = document.getElementById("kpis");
+  var kpiCount = document.getElementById("kpi-count");
+  var kpiDay = document.getElementById("kpi-day");
+  var kpiWeek = document.getElementById("kpi-week");
+  var kpiTtft = document.getElementById("kpi-ttft");
   var drawer = document.getElementById("drawer");
   var drawerBackdrop = document.getElementById("drawer-backdrop");
   var drawerTitle = document.getElementById("drawer-title");
@@ -125,14 +130,74 @@
     for (var i = 0; i < sorted.length; i++) {
       tbody.appendChild(renderRow(sorted[i]));
     }
+    applyBadges(sorted);
     if (filterCountEl) {
       filterCountEl.textContent = sorted.length + " of " + data.length + " models";
     }
     updateHeaderIndicators();
   }
 
+  var badgeCols = [
+    { idx: 1, val: function (m) { return m.inputPricePerToken; }, best: "Lowest input price among the shown models", worst: "Highest input price among the shown models" },
+    { idx: 2, val: function (m) { return m.outputPricePerToken; }, best: "Lowest output price among the shown models", worst: "Highest output price among the shown models" },
+    { idx: 3, val: function (m) { return m.ttft_ms; }, best: "Fastest TTFT among the shown models", worst: "Slowest TTFT among the shown models" },
+    { idx: 7, val: dayCost, best: "Lowest daily cost among the shown models", worst: "Highest daily cost among the shown models" },
+    { idx: 10, val: weekCost, best: "Lowest weekly cost among the shown models", worst: "Highest weekly cost among the shown models" }
+  ];
+
+  function applyBadges(sorted) {
+    if (sorted.length < 2) return;
+    var rows = tbody.children;
+    for (var c = 0; c < badgeCols.length; c++) {
+      var col = badgeCols[c];
+      var min = col.val(sorted[0]);
+      var max = col.val(sorted[0]);
+      for (var i = 1; i < sorted.length; i++) {
+        var v = col.val(sorted[i]);
+        if (v < min) min = v;
+        if (v > max) max = v;
+      }
+      if (min === max) continue;
+      for (var r = 0; r < rows.length; r++) {
+        var td = rows[r].children[col.idx];
+        if (!td) continue;
+        var cellVal = col.val(sorted[r]);
+        if (cellVal === min) {
+          td.className = td.className + " is-best";
+          td.title = col.best;
+        } else if (cellVal === max) {
+          td.className = td.className + " is-worst";
+          td.title = col.worst;
+        }
+      }
+    }
+  }
+
+  function renderKPIs() {
+    if (!kpiCount) return;
+    var set = visibleData();
+    if (!set.length) {
+      kpiCount.textContent = "–";
+      kpiDay.textContent = "–";
+      kpiWeek.textContent = "–";
+      kpiTtft.textContent = "–";
+      return;
+    }
+    var d = 0, w = 0, ttft = 0;
+    for (var i = 0; i < set.length; i++) {
+      d += dayCost(set[i]);
+      w += weekCost(set[i]);
+      ttft += set[i].ttft_ms;
+    }
+    kpiCount.textContent = String(set.length);
+    kpiDay.textContent = formatCost(d);
+    kpiWeek.textContent = formatCost(w);
+    kpiTtft.textContent = Math.round(ttft / set.length) + " ms";
+  }
+
   function renderAll() {
     render();
+    renderKPIs();
     renderComparativa();
   }
 
@@ -192,6 +257,7 @@
     chartSection.hidden = true;
     if (filtersBox) filtersBox.hidden = true;
     if (compareSection) compareSection.hidden = true;
+    if (kpisBox) kpisBox.hidden = true;
   }
 
   var defaultDirs = { name: "asc", modality: "asc" };
