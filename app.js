@@ -58,25 +58,27 @@
     return m.inputModality + " -> " + m.outputModality;
   }
 
-  function cell(text) {
+  function cell(text, group) {
     var td = document.createElement("td");
     td.textContent = text;
+    if (group) td.className = group;
     return td;
   }
 
   function renderRow(m) {
     var tr = document.createElement("tr");
-    tr.appendChild(cell(m.name));
-    tr.appendChild(cell(formatPrice(m.inputPricePerToken)));
-    tr.appendChild(cell(formatPrice(m.outputPricePerToken)));
-    tr.appendChild(cell(formatTtft(m.ttft_ms)));
-    tr.appendChild(cell(formatModality(m)));
-    tr.appendChild(cell(formatTokens(m.inputTokensDay)));
-    tr.appendChild(cell(formatTokens(m.outputTokensDay)));
-    tr.appendChild(cell(formatCost(dayCost(m))));
-    tr.appendChild(cell(formatTokens(m.inputTokensWeek)));
-    tr.appendChild(cell(formatTokens(m.outputTokensWeek)));
-    tr.appendChild(cell(formatCost(weekCost(m))));
+    tr.dataset.modelIndex = String(data.indexOf(m));
+    tr.appendChild(cell(m.name, "g-name"));
+    tr.appendChild(cell(formatPrice(m.inputPricePerToken), "g-price"));
+    tr.appendChild(cell(formatPrice(m.outputPricePerToken), "g-price"));
+    tr.appendChild(cell(formatTtft(m.ttft_ms), "g-time"));
+    tr.appendChild(cell(formatModality(m), "g-modality"));
+    tr.appendChild(cell(formatTokens(m.inputTokensDay), "g-vol"));
+    tr.appendChild(cell(formatTokens(m.outputTokensDay), "g-vol"));
+    tr.appendChild(cell(formatCost(dayCost(m)), "g-cost"));
+    tr.appendChild(cell(formatTokens(m.inputTokensWeek), "g-vol"));
+    tr.appendChild(cell(formatTokens(m.outputTokensWeek), "g-vol"));
+    tr.appendChild(cell(formatCost(weekCost(m)), "g-cost"));
     return tr;
   }
 
@@ -178,7 +180,7 @@
     {
       id: "inPrice",
       short: "In price",
-      color: "#4472c4",
+      color: "#1b3b5f",
       desc: "Input price per 1,000,000 tokens (USD) - what you pay for every million tokens you send to the model.",
       get: function (m) { return m.inputPricePerToken; },
       fmt: formatPrice
@@ -186,7 +188,7 @@
     {
       id: "outPrice",
       short: "Out price",
-      color: "#ed7d31",
+      color: "#356ea6",
       desc: "Output price per 1,000,000 tokens (USD) - what you pay for every million tokens the model generates.",
       get: function (m) { return m.outputPricePerToken; },
       fmt: formatPrice
@@ -194,7 +196,7 @@
     {
       id: "ttft",
       short: "TTFT",
-      color: "#70ad47",
+      color: "#78aad6",
       desc: "Time to first token in milliseconds - how long until the model starts replying. Lower is faster.",
       get: function (m) { return m.ttft_ms; },
       fmt: function (v) { return v + " ms"; }
@@ -202,7 +204,7 @@
     {
       id: "dayTokens",
       short: "Day tokens",
-      color: "#ffc000",
+      color: "#2f8a96",
       desc: "Total tokens processed per day (input + output).",
       get: function (m) { return m.inputTokensDay + m.outputTokensDay; },
       fmt: formatTokens
@@ -210,7 +212,7 @@
     {
       id: "dayCost",
       short: "Day cost",
-      color: "#c00000",
+      color: "#24344d",
       desc: "Estimated daily cost = (day input tokens x input price) + (day output tokens x output price).",
       get: dayCost,
       fmt: formatCost
@@ -218,7 +220,7 @@
     {
       id: "weekCost",
       short: "Week cost",
-      color: "#7030a0",
+      color: "#5f96cf",
       desc: "Estimated weekly cost = (week input tokens x input price) + (week output tokens x output price).",
       get: weekCost,
       fmt: formatCost

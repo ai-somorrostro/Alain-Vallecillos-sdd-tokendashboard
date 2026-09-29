@@ -4,52 +4,55 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Token Dashboard</title>
-  <link rel="stylesheet" href="style.css?v=2">
+  <link rel="stylesheet" href="style.css?v=3">
 </head>
 <body>
-  <h1>Token Dashboard</h1>
-  <p class="subtitle">Model pricing, latency, and token volume comparison</p>
+  <div class="main">
+    <h1>Token Dashboard</h1>
+    <p class="subtitle">Model pricing, latency, and token volume comparison</p>
 
-  <div id="error" class="error" hidden></div>
+    <div id="error" class="error" hidden></div>
 
-  <div class="table-wrap">
-    <table id="dashboard">
-      <thead>
-        <tr>
-          <th data-key="name" scope="col" title="Model name. Click the header to sort alphabetically.">Model</th>
-          <th data-key="inputPricePerToken" scope="col" title="Input price per 1,000,000 tokens in USD. What you pay for every million tokens you send to the model. Click to sort.">In $/1M</th>
-          <th data-key="outputPricePerToken" scope="col" title="Output price per 1,000,000 tokens in USD. What you pay for every million tokens the model generates. Click to sort.">Out $/1M</th>
-          <th data-key="ttft_ms" scope="col" title="Time to first token, in milliseconds. How long until the model starts replying. Lower is faster. Click to sort.">TTFT</th>
-          <th data-key="modality" scope="col" title="Data types accepted as input -> data type produced as output, e.g. Text+Image -> Text. Click to sort.">Modality</th>
-          <th data-key="inputTokensDay" scope="col" title="Input tokens consumed per day. Click to sort.">Day In</th>
-          <th data-key="outputTokensDay" scope="col" title="Output tokens generated per day. Click to sort.">Day Out</th>
-          <th data-key="dayCost" scope="col" title="Estimated daily cost = (day input tokens x input price) + (day output tokens x output price). Click to sort.">Day Cost</th>
-          <th data-key="inputTokensWeek" scope="col" title="Input tokens consumed per week. Click to sort.">Week In</th>
-          <th data-key="outputTokensWeek" scope="col" title="Output tokens generated per week. Click to sort.">Week Out</th>
-          <th data-key="weekCost" scope="col" title="Estimated weekly cost = (week input tokens x input price) + (week output tokens x output price). Click to sort.">Week Cost</th>
-        </tr>
-      </thead>
-      <tbody id="rows"></tbody>
-    </table>
+    <div class="table-wrap">
+      <table id="dashboard">
+        <thead>
+          <tr>
+            <th data-key="name" class="g-name" scope="col" title="Model name. Click the header to sort alphabetically.">Model</th>
+            <th data-key="inputPricePerToken" class="g-price" scope="col" title="Input price per 1,000,000 tokens in USD. What you pay for every million tokens you send to the model. Click to sort.">In $/1M</th>
+            <th data-key="outputPricePerToken" class="g-price" scope="col" title="Output price per 1,000,000 tokens in USD. What you pay for every million tokens the model generates. Click to sort.">Out $/1M</th>
+            <th data-key="ttft_ms" class="g-time" scope="col" title="Time to first token, in milliseconds. How long until the model starts replying. Lower is faster. Click to sort.">TTFT</th>
+            <th data-key="modality" class="g-modality" scope="col" title="Data types accepted as input -> data type produced as output, e.g. Text+Image -> Text. Click to sort.">Modality</th>
+            <th data-key="inputTokensDay" class="g-vol" scope="col" title="Input tokens consumed per day. Click to sort.">Day In</th>
+            <th data-key="outputTokensDay" class="g-vol" scope="col" title="Output tokens generated per day. Click to sort.">Day Out</th>
+            <th data-key="dayCost" class="g-cost" scope="col" title="Estimated daily cost = (day input tokens x input price) + (day output tokens x output price). Click to sort.">Day Cost</th>
+            <th data-key="inputTokensWeek" class="g-vol" scope="col" title="Input tokens consumed per week. Click to sort.">Week In</th>
+            <th data-key="outputTokensWeek" class="g-vol" scope="col" title="Output tokens generated per week. Click to sort.">Week Out</th>
+            <th data-key="weekCost" class="g-cost" scope="col" title="Estimated weekly cost = (week input tokens x input price) + (week output tokens x output price). Click to sort.">Week Cost</th>
+          </tr>
+        </thead>
+        <tbody id="rows"></tbody>
+      </table>
+    </div>
+    <p class="hint">Tip: click a row to open the model detail.</p>
+
+    <div class="chart-controls" id="chart-controls">
+      <button id="chart-toggle" type="button" aria-expanded="true" aria-controls="chart-section">Hide chart</button>
+      <span id="chart-pick">
+        <label for="model-select">Model:</label>
+        <select id="model-select" disabled>
+          <option value="">Loading models...</option>
+        </select>
+      </span>
+    </div>
+
+    <section id="chart-section" aria-label="Selected model chart">
+      <h2 id="chart-title">Metrics</h2>
+      <p class="chart-note">Each bar is relative to the highest value for that metric among all models (100%). The real value is printed above each bar.</p>
+      <div class="chart-area" id="chart-area"></div>
+      <ul class="legend" id="chart-legend"></ul>
+    </section>
+
+    <script src="app.js?v=3"></script>
   </div>
-
-  <div class="chart-controls" id="chart-controls">
-    <button id="chart-toggle" type="button" aria-expanded="true" aria-controls="chart-section">Hide chart</button>
-    <span id="chart-pick">
-      <label for="model-select">Model:</label>
-      <select id="model-select" disabled>
-        <option value="">Loading models...</option>
-      </select>
-    </span>
-  </div>
-
-  <section id="chart-section" aria-label="Selected model chart">
-    <h2 id="chart-title">Metrics</h2>
-    <p class="chart-note">Each bar is relative to the highest value for that metric among all models (100%). The real value is printed above each bar.</p>
-    <div class="chart-area" id="chart-area"></div>
-    <ul class="legend" id="chart-legend"></ul>
-  </section>
-
-  <script src="app.js?v=2"></script>
 </body>
 </html>
