@@ -15,6 +15,7 @@
   var filterNameEl = document.getElementById("filter-name");
   var filterModalityEl = document.getElementById("filter-modality");
   var filterCountEl = document.getElementById("filter-count");
+  var compareSection = document.getElementById("compare-section");
 
   var data = [];
   var sortState = { key: null, dir: "desc" };
@@ -125,6 +126,7 @@
 
   function renderAll() {
     render();
+    renderComparativa();
   }
 
   var comparators = {
@@ -182,6 +184,7 @@
     chartControls.hidden = true;
     chartSection.hidden = true;
     if (filtersBox) filtersBox.hidden = true;
+    if (compareSection) compareSection.hidden = true;
   }
 
   var defaultDirs = { name: "asc", modality: "asc" };
@@ -351,6 +354,126 @@
       li.appendChild(document.createTextNode(metrics[i].desc));
       chartLegend.appendChild(li);
     }
+  }
+
+  function emptyChart(container, text) {
+    container.textContent = "";
+    var p = document.createElement("p");
+    p.className = "empty-chart";
+    p.textContent = text;
+    container.appendChild(p);
+  }
+
+  function miniLegend(container, items) {
+    var ul = document.createElement("ul");
+    ul.className = "legend";
+    for (var i = 0; i < items.length; i++) {
+      var li = document.createElement("li");
+      var sw = document.createElement("span");
+      sw.className = "swatch";
+      sw.style.backgroundColor = items[i].color;
+      li.appendChild(sw);
+      li.appendChild(document.createTextNode(items[i].label));
+      ul.appendChild(li);
+    }
+    container.appendChild(ul);
+  }
+
+  function renderGroupedChart(container, models, series, ariaPrefix) {
+    if (!container) return;
+    if (!models.length) {
+      emptyChart(container, "No models match the filters.");
+      return;
+    }
+    var W = 560, H = 300, L = 46, R = 8, T = 16, B = 56;
+    var plotW = W - L - R, plotH = H - T - B;
+    var max = 0;
+    var si, mi;
+    for (mi = 0; mi < models.length; mi++) {
+      for (si = 0; si < series.length; si++) {
+        var v = series[si].get(models[mi]);
+        if (v > max) max = v;
+      }
+    }
+    if (max <= 0) max = 1;
+    var svg = svgEl("svg", {
+      viewBox: "0 0 " + W + " " + H,
+      width: W,
+      height: H,
+      role: "img",
+      "aria-label": ariaPrefix + " for " + models.length + " models"
+    });
+
+    for (var p = 0; p <= 4; p++) {
+      var gy = T + plotH - (plotH * p) / 4;
+      svg.appendChild(svgEl("line", { x1: L, y1: gy, x2: W - R, y2: gy, "class": "grid" }));
+      var yl = svgEl("text", { x: L - 6, y: gy + 4, "class": "axis-label", "text-anchor": "end" });
+      yl.textContent = series[0].fmt((max * p) / 4);
+      svg.appendChild(yl);
+    }
+
+    var groupW = plotW / models.length;
+    var gap = 2;
+    var barW = Math.min(18, (groupW - 8) / series.length - gap);
+    for (mi = 0; mi < models.length; mi++) {
+      var m = models[mi];
+      var total = series.length * barW + (series.length - 1) * gap;
+      var start = L + groupW * mi + (groupW - total) / 2;
+      for (si = 0; si < series.length; si++) {
+        var val = series[si].get(m);
+        var bh = (val / max) * plotH;
+        var rect = svgEl("rect", {
+          x: start + si * (barW + gap),
+          y: T + plotH - bh,
+          width: barW,
+          height: bh,
+          fill: series[si].color,
+          "class": "bar"
+        });
+        var title = svgEl("title");
+        title.textContent = m.name + " — " + series[si].label + ": " + series[si].fmt(val);
+        rect.appendChild(title);
+        svg.appendChild(rect);
+      }
+      var cx = L + groupW * mi + groupW / 2;
+      var ly = T + plotH + 14;
+      var lbl = svgEl("text", {
+        x: cx,
+        y: ly,
+        "class": "axis-label",
+        "text-anchor": "end",
+        transform: "rotate(-20 " + cx + " " + ly + ")"
+      });
+      lbl.textContent = m.name.split(" ")[0];
+      svg.appendChild(lbl);
+    }
+    svg.appendChild(svgEl("line", { x1: L, y1: T + plotH, x2: W - R, y2: T + plotH, "class": "baseline" }));
+
+    container.textContent = "";
+    container.appendChild(svg);
+    var items = [];
+    for (si = 0; si < series.length; si++) {
+      items.push({ label: series[si].label, color: series[si].color });
+    }
+    miniLegend(container, items);
+  }
+
+  var SERIES_IN = "#1b3b5f";
+  var SERIES_OUT = "#356ea6";
+
+  function renderComparativa() {
+    renderGroupedChart(document.getElementById("price-chart"), visibleData(), [
+      { label: "Input price", color: SERIES_IN, get: function (m) { return m.inputPricePerToken; }, fmt: formatPrice },
+      { label: "Output price", color: SERIES_OUT, get: function (m) { return m.outputPricePerToken; }, fmt: formatPrice }
+    ], "Input and output price per 1M tokens");
+    renderGroupedChart(document.getElementById("day-chart"), visibleData(), [
+      { label: "Day in", color: SERIES_IN, get: function (m) { return m.inputTokensDay; }, fmt: formatTokens },
+      { label: "Day out", color: SERIES_OUT, get: function (m) { return m.outputTokensDay; }, fmt: formatTokens }
+    ], "Daily token consumption");
+    renderGroupedChart(document.getElementById("week-chart"), visibleData(), [
+      { label: "Week in", color: SERIES_IN, get: function (m) { return m.inputTokensWeek; }, fmt: formatTokens },
+      { label: "Week out", color: SERIES_OUT, get: function (m) { return m.outputTokensWeek; }, fmt: formatTokens }
+    ], "Weekly token consumption");
   }
 
   function populateSelect() {
