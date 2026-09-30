@@ -85,7 +85,7 @@ Todo el trabajo debe estructurarse bajo el prefijo `nombre.apellido` de cada des
 
 ---
 
-# Notas del proyecto (openspec-token-dashboard-demo)
+# Notas del proyecto (pruebas)
 
 Dashboard de comparación de modelos de lenguaje: precios, latencia (TTFT),
 modalidad y volumen de tokens (día/semana), con costes derivados.

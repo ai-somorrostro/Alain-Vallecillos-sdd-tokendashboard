@@ -21,7 +21,9 @@
   var kpiDay = document.getElementById("kpi-day");
   var kpiWeek = document.getElementById("kpi-week");
   var kpiTtft = document.getElementById("kpi-ttft");
-  var duelSection = document.getElementById("duel-section");
+  var duelWrap = document.getElementById("duel-wrap");
+  var duelPeek = document.getElementById("duel-peek");
+  var duelHide = document.getElementById("duel-hide");
   var duelA = document.getElementById("duel-a");
   var duelB = document.getElementById("duel-b");
   var duelHeadA = document.getElementById("duel-head-a");
@@ -138,9 +140,7 @@
       tbody.appendChild(renderRow(sorted[i]));
     }
     applyBadges(sorted);
-    if (filterCountEl) {
-      filterCountEl.textContent = sorted.length + " of " + data.length + " models";
-    }
+    filterCountEl.textContent = sorted.length + " of " + data.length + " models";
     updateHeaderIndicators();
   }
 
@@ -181,7 +181,6 @@
   }
 
   function renderKPIs() {
-    if (!kpiCount) return;
     var set = visibleData();
     if (!set.length) {
       kpiCount.textContent = "–";
@@ -262,11 +261,44 @@
     errorBox.hidden = false;
     chartControls.hidden = true;
     chartSection.hidden = true;
-    if (filtersBox) filtersBox.hidden = true;
-    if (compareSection) compareSection.hidden = true;
-    if (kpisBox) kpisBox.hidden = true;
-    if (duelSection) duelSection.hidden = true;
+    filtersBox.hidden = true;
+    compareSection.hidden = true;
+    kpisBox.hidden = true;
+    duelWrap.hidden = true;
   }
+
+  var DUEL_VISIBLE_KEY = "tokenDashboard.duelVisible";
+
+  function isDuelVisible() {
+    try {
+      return localStorage.getItem(DUEL_VISIBLE_KEY) === "1";
+    } catch (e) {
+      return false;
+    }
+  }
+
+  function setDuelVisible(visible, moveFocus) {
+    duelWrap.setAttribute("data-state", visible ? "open" : "closed");
+    duelPeek.setAttribute("aria-expanded", String(visible));
+    try {
+      localStorage.setItem(DUEL_VISIBLE_KEY, visible ? "1" : "0");
+    } catch (e) {
+      /* storage unavailable: state just will not persist */
+    }
+    if (moveFocus) {
+      (visible ? duelHide : duelPeek).focus();
+    }
+  }
+
+  setDuelVisible(isDuelVisible(), false);
+
+  duelPeek.addEventListener("click", function () {
+    setDuelVisible(true, true);
+  });
+
+  duelHide.addEventListener("click", function () {
+    setDuelVisible(false, true);
+  });
 
   var defaultDirs = { name: "asc", modality: "asc" };
 
@@ -469,7 +501,6 @@
   }
 
   function renderGroupedChart(container, models, series, ariaPrefix) {
-    if (!container) return;
     if (!models.length) {
       emptyChart(container, "No models match the filters.");
       return;
@@ -551,15 +582,16 @@
   var SERIES_OUT = "#356ea6";
 
   function renderComparativa() {
-    renderGroupedChart(document.getElementById("price-chart"), visibleData(), [
+    var models = visibleData();
+    renderGroupedChart(document.getElementById("price-chart"), models, [
       { label: "Input price", color: SERIES_IN, get: function (m) { return m.inputPricePerToken; }, fmt: formatPrice },
       { label: "Output price", color: SERIES_OUT, get: function (m) { return m.outputPricePerToken; }, fmt: formatPrice }
     ], "Input and output price per 1M tokens");
-    renderGroupedChart(document.getElementById("day-chart"), visibleData(), [
+    renderGroupedChart(document.getElementById("day-chart"), models, [
       { label: "Day in", color: SERIES_IN, get: function (m) { return m.inputTokensDay; }, fmt: formatTokens },
       { label: "Day out", color: SERIES_OUT, get: function (m) { return m.outputTokensDay; }, fmt: formatTokens }
     ], "Daily token consumption");
-    renderGroupedChart(document.getElementById("week-chart"), visibleData(), [
+    renderGroupedChart(document.getElementById("week-chart"), models, [
       { label: "Week in", color: SERIES_IN, get: function (m) { return m.inputTokensWeek; }, fmt: formatTokens },
       { label: "Week out", color: SERIES_OUT, get: function (m) { return m.outputTokensWeek; }, fmt: formatTokens }
     ], "Weekly token consumption");
@@ -605,7 +637,7 @@
 
   function openDrawer(idx) {
     var m = data[idx];
-    if (!m || !drawer) return;
+    if (!m) return;
     drawerTitle.textContent = m.name;
     drawerSub.textContent = "All figures per 1,000,000 tokens unless stated otherwise.";
     drawerGrid.textContent = "";
@@ -638,11 +670,10 @@
     drawerChart.appendChild(buildChartSvg(m));
     drawer.hidden = false;
     drawerBackdrop.hidden = false;
-    if (drawerClose.focus) drawerClose.focus();
+    drawerClose.focus();
   }
 
   function closeDrawer() {
-    if (!drawer) return;
     drawer.hidden = true;
     drawerBackdrop.hidden = true;
   }
@@ -655,14 +686,13 @@
     openDrawer(idx);
   });
 
-  if (drawerClose) drawerClose.addEventListener("click", closeDrawer);
-  if (drawerBackdrop) drawerBackdrop.addEventListener("click", closeDrawer);
+  drawerClose.addEventListener("click", closeDrawer);
+  drawerBackdrop.addEventListener("click", closeDrawer);
   document.addEventListener("keydown", function (e) {
-    if (e.key === "Escape" && drawer && !drawer.hidden) closeDrawer();
+    if (e.key === "Escape" && !drawer.hidden) closeDrawer();
   });
 
   function populateDuelSelects() {
-    if (!duelA || !duelB) return;
     duelA.textContent = "";
     duelB.textContent = "";
     for (var i = 0; i < data.length; i++) {
@@ -680,7 +710,6 @@
   }
 
   function renderDuelChart(A, B) {
-    if (!duelChart) return;
     duelChart.textContent = "";
     var W = 640, H = 300, L = 48, R = 8, T = 24, B2 = 56;
     var plotW = W - L - R, plotH = H - T - B2;
@@ -749,7 +778,7 @@
   }
 
   function renderDuel() {
-    if (!data.length || !duelRows) return;
+    if (!data.length) return;
     var ia = parseInt(duelA.value, 10);
     var ib = parseInt(duelB.value, 10);
     if (isNaN(ia) || ia < 0 || ia >= data.length) ia = 0;
@@ -782,10 +811,8 @@
     renderDuelChart(A, B);
   }
 
-  if (duelA && duelB) {
-    duelA.addEventListener("change", renderDuel);
-    duelB.addEventListener("change", renderDuel);
-  }
+  duelA.addEventListener("change", renderDuel);
+  duelB.addEventListener("change", renderDuel);
 
   fetch("mock-data.json")
     .then(function (res) {

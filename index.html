@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Token Dashboard</title>
-  <link rel="stylesheet" href="style.css?v=3">
+  <link rel="stylesheet" href="style.css?v=7">
 </head>
 <body>
   <div class="main">
@@ -66,16 +66,16 @@
         <thead>
           <tr>
             <th data-key="name" class="g-name" scope="col" title="Model name. Click the header to sort alphabetically.">Model</th>
-            <th data-key="inputPricePerToken" class="g-price" scope="col" title="Input price per 1,000,000 tokens in USD. What you pay for every million tokens you send to the model. Click to sort.">In $/1M</th>
-            <th data-key="outputPricePerToken" class="g-price" scope="col" title="Output price per 1,000,000 tokens in USD. What you pay for every million tokens the model generates. Click to sort.">Out $/1M</th>
-            <th data-key="ttft_ms" class="g-time" scope="col" title="Time to first token, in milliseconds. How long until the model starts replying. Lower is faster. Click to sort.">TTFT</th>
+            <th data-key="inputPricePerToken" scope="col" title="Input price per 1,000,000 tokens in USD. What you pay for every million tokens you send to the model. Click to sort.">In $/1M</th>
+            <th data-key="outputPricePerToken" scope="col" title="Output price per 1,000,000 tokens in USD. What you pay for every million tokens the model generates. Click to sort.">Out $/1M</th>
+            <th data-key="ttft_ms" scope="col" title="Time to first token, in milliseconds. How long until the model starts replying. Lower is faster. Click to sort.">TTFT</th>
             <th data-key="modality" class="g-modality" scope="col" title="Data types accepted as input -> data type produced as output, e.g. Text+Image -> Text. Click to sort.">Modality</th>
-            <th data-key="inputTokensDay" class="g-vol" scope="col" title="Input tokens consumed per day. Click to sort.">Day In</th>
-            <th data-key="outputTokensDay" class="g-vol" scope="col" title="Output tokens generated per day. Click to sort.">Day Out</th>
-            <th data-key="dayCost" class="g-cost" scope="col" title="Estimated daily cost = (day input tokens x input price) + (day output tokens x output price). Click to sort.">Day Cost</th>
-            <th data-key="inputTokensWeek" class="g-vol" scope="col" title="Input tokens consumed per week. Click to sort.">Week In</th>
-            <th data-key="outputTokensWeek" class="g-vol" scope="col" title="Output tokens generated per week. Click to sort.">Week Out</th>
-            <th data-key="weekCost" class="g-cost" scope="col" title="Estimated weekly cost = (week input tokens x input price) + (week output tokens x output price). Click to sort.">Week Cost</th>
+            <th data-key="inputTokensDay" scope="col" title="Input tokens consumed per day. Click to sort.">Day In</th>
+            <th data-key="outputTokensDay" scope="col" title="Output tokens generated per day. Click to sort.">Day Out</th>
+            <th data-key="dayCost" scope="col" title="Estimated daily cost = (day input tokens x input price) + (day output tokens x output price). Click to sort.">Day Cost</th>
+            <th data-key="inputTokensWeek" scope="col" title="Input tokens consumed per week. Click to sort.">Week In</th>
+            <th data-key="outputTokensWeek" scope="col" title="Output tokens generated per week. Click to sort.">Week Out</th>
+            <th data-key="weekCost" scope="col" title="Estimated weekly cost = (week input tokens x input price) + (week output tokens x output price). Click to sort.">Week Cost</th>
           </tr>
         </thead>
         <tbody id="rows"></tbody>
@@ -100,25 +100,51 @@
       <ul class="legend" id="chart-legend"></ul>
     </section>
 
-    <section class="panel" id="duel-section" aria-label="Compare two models">
-      <h2>Comparador de modelos</h2>
-      <div class="duel-controls">
-        <select id="duel-a" aria-label="First model to compare"></select>
-        <span class="duel-vs">vs</span>
-        <select id="duel-b" aria-label="Second model to compare"></select>
+    <div class="duel-wrap" id="duel-wrap" data-state="closed">
+      <button id="duel-peek" class="duel-peek" type="button" aria-expanded="false" aria-controls="duel-section">
+        <svg class="peek-eye" viewBox="0 0 64 40" width="52" height="33" aria-hidden="true" focusable="false">
+          <defs>
+            <clipPath id="peek-eye-clip">
+              <path d="M4 20 C 16 6, 48 6, 60 20 C 48 34, 16 34, 4 20 Z" />
+            </clipPath>
+          </defs>
+          <g clip-path="url(#peek-eye-clip)">
+            <circle class="peek-iris" cx="32" cy="20" r="8.5" />
+            <circle class="peek-pupil" cx="32" cy="20" r="3.4" />
+            <circle class="peek-glint" cx="35.2" cy="16.8" r="1.5" />
+            <rect class="peek-lid" x="0" y="-40" width="64" height="40" />
+          </g>
+          <path class="lid-outline" d="M4 20 C 16 6, 48 6, 60 20 C 48 34, 16 34, 4 20 Z" />
+        </svg>
+        <span class="peek-label">Comparador de modelos</span>
+        <span class="peek-hint">Pulsa para abrir</span>
+      </button>
+
+      <div class="duel-reveal" id="duel-reveal">
+        <section class="panel" id="duel-section" aria-label="Compare two models">
+          <div class="duel-head">
+            <h2>Comparador de modelos</h2>
+            <button id="duel-hide" class="duel-hide" type="button" aria-controls="duel-section">Ocultar</button>
+          </div>
+          <div class="duel-controls">
+            <select id="duel-a" aria-label="First model to compare"></select>
+            <span class="duel-vs">vs</span>
+            <select id="duel-b" aria-label="Second model to compare"></select>
+          </div>
+          <table id="duel-table">
+            <thead>
+              <tr>
+                <th scope="col">Metric</th>
+                <th scope="col" id="duel-head-a">Model A</th>
+                <th scope="col" id="duel-head-b">Model B</th>
+              </tr>
+            </thead>
+            <tbody id="duel-rows"></tbody>
+          </table>
+          <div id="duel-chart"></div>
+        </section>
       </div>
-      <table id="duel-table">
-        <thead>
-          <tr>
-            <th scope="col">Metric</th>
-            <th scope="col" id="duel-head-a">Model A</th>
-            <th scope="col" id="duel-head-b">Model B</th>
-          </tr>
-        </thead>
-        <tbody id="duel-rows"></tbody>
-      </table>
-      <div id="duel-chart"></div>
-    </section>
+    </div>
 
     <div class="drawer-backdrop" id="drawer-backdrop" hidden></div>
     <aside class="drawer" id="drawer" hidden role="dialog" aria-modal="true" aria-labelledby="drawer-title">
@@ -132,7 +158,7 @@
       <div class="chart-area" id="drawer-chart"></div>
     </aside>
 
-    <script src="app.js?v=8"></script>
+    <script src="app.js?v=11"></script>
   </div>
 </body>
 </html>
