@@ -116,3 +116,9 @@ alain.vallecillos.master     scaffold del curso + estas notas
 
 Planificación con [OpenSpec](https://openspec.org): los cambios viven en
 `openspec/changes/` (ver `add-token-dashboard`).
+
+
+
+# DOCKER 
+
+Para crear el docker hay que usar el comando: docker build -t tokendashboard. Asi se crea una imafen de docker siguiendo las instrucciones puestas en el Dockerfile. Con el docker run -d -p 8000:8000 --name tokendashboard inicia un contenedor en segundo plano que conecta el puerto 8000 del contenedor con el puerto 8000 local de mi pc para abrirlo en localhost:8000 (http://localhost:8000)
